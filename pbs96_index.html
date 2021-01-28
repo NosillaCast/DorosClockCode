@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+					
+		<!-- Include Bootstrap 4 CSS -->
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+		
+		<!-- Include Font Awesome 5 -->
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+		
+		<title>PBS 96 — Challenge Response</title>
+		
+		<!-- styles for clocks -->
+		<style>
+		.ddr-worldclock{
+			font-weight: bold;
+			border-style: solid;
+			border-color: green;
+			background-color: black;
+			color: lightgreen;
+			font-family: monospace;
+			display: block;
+			padding: 0.25em;
+			vertical-align: middle;
+			font-size: 20pt;
+			text-align: center;
+			margin-left: 5em;
+			margin-right: 5em;
+			border-width: 3px;
+			border-radius: 30px;
+			margin: auto;
+		}
+
+		.ddr-worldclock-tzname{
+			color: DarkOliveGreen;
+			font-weight: normal;
+			font-size: 10pt;
+			margin-top: 0.25em;
+			margin-bottom: 0.25em;
+		}
+		.ddr-worldclock-weekday{
+			color: DarkOliveGreen;
+			font-weight: normal;
+			font-size: 10pt;
+			margin-top: 0.25em;
+			margin-bottom: 0.25em;
+		}
+
+		</style>
+
+
+	</head>
+	
+	<body>
+	<!-- The main page body -->
+	<main class="container mb-5">
+		<!-- The Page header (a Jumbotron) -->
+		<header class="container">
+		 	<div class="text-center">
+				<h3 class=":block-4">PBS 96 Challenge Response<br><small class="text-muted">A World Clock (part 2)</small></h1>
+
+				<p class="lead">The challenge response for installment 96 of the <a href="https://bartb.ie/pbs" target="_blank" rel="noopener">Programming by Stealth</a> series.</p>
+		</div>
+		</header>
+
+	<!-- put local clock here -->
+	<div class="container d-flex justify-content-center">
+		<div class="row ">
+			<div class="col-12 text-center">
+				<label class="h5 " for="clock1" >Local Time:</label>
+				<span id="clock1" class="d-block "></span>
+			</div>
+		</div>
+	</div>
+	<br>
+
+	<br>
+
+	<!-- user options go here -->
+	<div class="container " id="clock_config_fm">
+		<legend id="clock_config_desc" class="text-center">--- Configure Request ---</legend>	
+
+		<!-- Timezone selection -->
+		<div class="row form-group d-flex justify-content-center">
+			<div class="col ">
+				<label class="" for="tz_sel">Timezone Selection </label>
+				<input type="text" id="tz_sel" class="form-control w-100" autocomplete="off">
+				<small class="form-text text-muted">Enter an <a href="https://en.wikipedia.org/wiki/Tz_database" target="_blank" rel="noopener">IANA timezone string</a>, or just start typing a city name for auto-complete suggestions.</small>
+			</div>
+		</div>
+
+		<!-- date picker widget here --->
+		<div class="row form-group ">
+			<div class="col col-sm-6 ">
+				<label class="" for="datetimepicker2">Select meeting date & time</label>
+				<div class="input-group date" id="datetimepicker2" data-target-input="nearest">
+					<input type="text" class="form-control datetimepicker-input w-75" data-target="#datetimepicker2" id="datetime-tb"/>
+					<div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
+						<div class="input-group-text"><i class="far fa-calendar-alt"></i></div>
+					</div>
+				</div>
+			</div>
+		</div>			<!-- </div> --->
+		<br>
+
+		<!-- Go button -->
+		<!-- Go button -->
+		<div class="row ">
+			<button class="col btn btn-success btn-sm form-control w-75" id="go_btn" mt-5 mb-5>Go!</button>
+			<small class="col form-text text-muted ">Click GO when date/time selection is complete.</small>
+		</div>
+
+	</fieldset>	
+	<hr>
+	<!-- app output goes here --->
+	<div class="container d-flex justify-content-center">
+		<div class="row ">
+			<div class=" text-center">
+				<label class="col h5 d-inline-block" for="clock2">Local Meeting Time:</label>
+				<span id="clock2" class="col d-inline-block "></span>
+			</div>
+			<br>
+			<div class="text-center">
+				<label class="col h5 d-inline-block" for="clock3">Remote Meeting Time:</label>
+				<span id="clock3" class="col d-inline-block "></span>
+			</div>
+
+			<div class="col-12 text-center">
+				<br>
+				<div class="form-group text-center">
+					<label class="h6" for="req_link_tb">Remote Invitation Link</label>
+					<input type="text" id="req_link_tb" class="form-control" placeholder="https://a_link.com" size=120>
+					<small class="form-text text-muted">Copy this link & send to remote user.</small>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- put any errors here -->
+	<div id="output_div" class="m-3"></div>
+
+	<!-- revision date container -->
+	<div class="container">
+		<div class="row">	<!-- outer container, row 8> -->
+			<div class="col-12">	<!-- outer container, col 1> -->
+				<aside class="float-right text-muted p-2 mt-5 bg-light border rounded">
+				<p class="p-1 d-inline font-weight-light align-right" style="font-size: 10pt"> Last modified on:</p>
+				<p class="d-inline font-weight-light align-right" style="font-size: 10pt">09/17/2020; </p>
+				<p id="ddrwc_version" class="d-inline font-weight-light align-right" style="font-size: 10pt"></p>
+				</aside>
+			</div>		<!-- outer container, end of col> -->
+		</div>		<!-- outer container, end of row 8> -->
+	</div>
+
+	
+	<!-- ******************************************************************* -->
+	<!-- Mustache Templates -->
+	<!-- ******************************************************************* -->
+	<!-- none so far -->
+	
+	</main>
+		
+	</body>
+	
+	<!-- Import the is.js micro checking library -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/is_js/0.9.0/is.min.js" integrity="sha256-lnJeulOa3e5IO2EzHr8jKJ3CbT80MBwkS5a+n2ooIr4=" crossorigin="anonymous"></script>
+
+	<!-- Include Bootstrap JavaScript from CDNs -->
+	<script src="https://code.jquery.com/jquery-3.4.0.min.js" integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg=" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+
+	<!-- Include Mustache.js -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js" integrity="sha256-srhz/t0GOrmVGZryG24MVDyFDYZpvUH2+dnJ8FbpGi0=" crossorigin="anonymous"></script>
+
+	<!-- Include Bootstrap 4 Autocomplete from CDN -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap-4-autocomplete/dist/bootstrap-4-autocomplete.min.js" crossorigin="anonymous"></script>
+
+	<!-- Import the moment.js & moment-timezone.js libraries -->
+	<script type="text/javascript" src="lib/moment.js"></script>
+	<script type="text/javascript" src="lib/moment-timezone-with-data.js"></script>
+
+	<!-- Include Tempus Dominus from CDN -->
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
+
+	<!-- Import the URI.js Library -->
+	<script type="text/javascript" src="lib/URI-1.18.1.js"></script>
+
+	<!-- Import the pbs.WorldClock API -->
+	<script type="text/javascript" src="lib/WorldClock.js"></script>
+
+	<!-- Custom JS Code -->
+	<script type="text/javascript">
+	
+	// ******************************************************
+	// Global variables
+	// ******************************************************
+	let debug = false;				// debug mode. True = in test mode
+	let x1 = 0;
+	let x2 = 0;
+	let x3 = 0;
+	let x4 = 0;
+
+	let haveClockData = false;		// True if URL has clock data
+	let defDateTime = "";			// default date/time for date/time picker
+
+	// set default timezone to local timezone
+	const DEFAULT_TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+	const DEFAULT_TF = 12;				// 12-hour clock display is default
+	const DEFAULT_TIME = moment.utc();	// default time as moment object for fixed time clocks
+	const tzAutoCompleteSource = {};	// timezone auto-complete dictionary
+	const startOfDay = moment().startOf('day');	// get today's date, start of day for time picker
+	const PICKER_TIME_FORMAT = 'YYYY-MM-DD HH:mm';
+	const CLOCK_TIME_FORMAT = 'YYYY-MM-DD HH:mm dddd';
+
+	let TZ_selected = DEFAULT_TZ;
+	let hoursSelected = DEFAULT_TF;		// true = use 24-hour clock
+	let secDisplay = "FALSE";			// true = display seconds
+	let divDisplay = "FALSE";			// true = show pulsing dividers
+	
+	let senderData = {};			// URL query data as parsed from URL
+	let clockWidget ={};			// moment.js object
+	let loadComplete = false;		// true = DOM loaded
+	let sortBy = 0;					// 0 = sort by region & name, 1 = sort by TZ #
+	
+	let CW2 = {};					// requestor clock spans
+	let CW3 = {};
+	
+	// ******************************************************
+	// a jQuery Document Ready Event Handler
+	// ******************************************************
+	$(function(){
+	// constants
+	const ERRMSG = 0;
+
+	const $outputDiv = $('#output_div');	// where to put error/status messages
+	const $CLOCK = $('#clock1');			// clock widget
+	const $TZSEL_SELECT = $('#tz_sel');		// timezone selection
+	const $GO_BTN = $('#go_btn');			// Go button
+	const $DATETIMEPICKER = $('#datetimepicker2');	// date/time picker container
+	const $DATETIME_TB = $('#datetime-tb');		// date/time picker text box
+	const $INVITATION_URL = $('#req_link_tb');		// invitation URL
+
+	// ******************************************************
+	// helper functions
+	// ******************************************************
+	// ------------------------------------------------------------
+	// Create timezone auto-complete dictionary -->
+	// IN: nothing
+	// OUT: updated TZ dictionary
+	// ------------------------------------------------------------
+	function addTZOptions () {
+
+		// create auto-complete dictionary
+		let tzAutoCompleteCounter = 1;
+		for(const tzName of moment.tz.names()){
+			// break the timezone into parts
+			const tzParts = tzName.split('\/');
+					
+			// skip timezones with more than two parts
+			if(tzParts.length != 2) continue;
+							
+			// skip the artificial Etc region
+			if(tzParts[0] === 'Etc') continue;
+					
+			// if we got here, add the timezone as an option
+			tzAutoCompleteSource[tzName] = tzAutoCompleteCounter;
+			tzAutoCompleteCounter++;
+		}
+
+		// enable auto-complete on TZ input textbox
+		$TZSEL_SELECT.autocomplete({
+			source: tzAutoCompleteSource, // the autocomplete values
+			maximumItems: 10, // the maximum autocomplete suggestions
+			treshold: 1, // the minimum number of characters to search
+			onSelectItem: function(){ // event handler for selection of autocomplete suggestion
+				$TZSEL_SELECT.trigger('input');
+			}
+		});
+	}
+
+	// ------------------------------------------------------------
+	// add leading zeros to output string                       -->
+	// IN: number/string to pad, desired length of string
+	// OUT: string with number & leading zeroes
+	// ------------------------------------------------------------
+	function pad(num, size) {
+		var s = num+"";
+		while (s.length < size) s = "0" + s;
+		return s;
+	}
+
+	// ------------------------------------------------------------
+	// Extract local/remote timezone/requested time from URL    -->
+	// IN: nothing, current URL
+	// OUT: object with all URL data or defaults if data missing from URL
+	// ------------------------------------------------------------
+	function getURLData() {
+		// set defaults: sender timezone, receiver timezone, local time in UTC, local hour
+		let dataObj = {
+			"stz": DEFAULT_TZ,
+			"rtz": DEFAULT_TZ,
+			"time": DEFAULT_TIME		// needs to be moment object in UTC
+		}
+
+		console.log (`GUD: default time is ${DEFAULT_TIME.format()}`);
+		
+		// get URL data section from current URL
+		let urlData = (new URI()).query();
+		
+		// if data in URL,
+		if (urlData.length > 0) {
+			haveClockData = true;		// set flag: have clock data in URL
+			
+			// split URL data string into each data section
+			let dataArray = urlData.split("&");
+
+			// for each data section, do:
+			dataArray.forEach(function (d,i) {
+				let items = d.split("=");		// split into keyword/value
+				
+				// item 0 is key; item 1 is data
+				// verify key is good, i.e. existing key in dataObj
+				console.log (`GUD: checking key ${items[0]}`);
+				if (items[0] in dataObj) {
+					// key is good, update data object
+					dataObj[items[0]] = items[1];	// add to data object
+				}
+			});		// end for
+
+			// now have timezone & UTC time in return object
+			// verify the time is good
+			
+			// verify the timezones are good
+			
+			dataObj.time = moment.utc(dataObj.time);		// convert time string to moment object before we return it
+
+			// report what we have
+			console.log (`GUD: sender tz is ${dataObj.stz}`);
+			console.log (`GUD: receiver tz is ${dataObj.rtz}`);
+			let x = dataObj.time.format('dddd HH:mm');
+			console.log (`GUD: requested time in UTC is ${dataObj.time}`);
+
+		} else { 
+			// else (no data in URL) return defaults
+			console.log ('GUD: no data in URL, return defaults');
+		}
+		
+		console.log ("Exit GUD");
+		return dataObj;			// return parsed data as a object
+	}
+
+	// ========================================================
+	// Error Display functions
+	// ========================================================
+	// --------------------------------------
+	// Extract file/URL data from error data -->
+	// IN: error object from catch
+	// OUT: string
+	// --------------------------------------
+	function parseErrorResponse (errObj) {
+		//console.log (`PER: error statusText is ${errObj.statusText}`);
+		//console.log (`PER: error responseText is ${errObj.responseText}`);
+		let s1 = "";
+		let ss1 = [];
+		let ss2 = [];
+		try {
+			s1 = errObj.responseText;
+			ss1 = s1.split("<p>");		// remove first part of error response
+			ss2 = ss1[1].split("</p>");	// remove last part of error response
+		} catch (err) {
+			ss2[0] = errObj.responseText;
+		}
+		console.log (`PER: ${ss2}`);
+		
+		return ss2[0];
+	}
+	
+	// --------------------------------------------
+	// Provide error response & display message -->
+	// IN: error object from catch, operation text to go in error message
+	// OUT: resulting error message
+	// --------------------------------------
+	function processErrorCondition (errD, opText, errSource) {
+		errData = errD;		// put error object in global variable for console access
+		errDetail = "";
+		
+		console.log(`PEC: In catch`);
+		console.log(`PEC: errData: ${errD}, type is ${typeof errD}`);
+
+		// if no responseText
+		if (errD.responseText == undefined) {
+
+			//if no responseText, try statusText, if that's not there, use message object as is
+			if (errD.statusText == undefined) {
+				errDetail = errD;			// use error return as is
+			} else {
+				errDetail = errD.statusText;
+			}
+
+		} else {	// if is a file error
+			errDetail = parseErrorResponse(errD);	// extract file name from error data
+		}
+		console.log(`PEC: Promises rejected: ${errDetail}`);
+
+		displayStatusMessage(errSource, errDetail, opText, ERRMSG);
+		
+		return errDetail;
+	}
+
+	// --------------------------------------
+	// display primary and error messages -->
+	// --------------------------------------
+	function displayStatusMessage(sTxt, eTxt, fType, mType){
+		
+		console.log (`DSM: error is ${eTxt}`);
+		// <!-- primary message Mustache template
+		const priTemplate = "<div class=\"alert alert-primary border border-primary rounded mb-3\"> {{message}} {{> closeBtn}}</div>";
+		// <!-- error message Mustache template partials -->
+		const errTemplate = "<div class=\"alert alert-danger border border-danger rounded mb-3\"> {{message}} {{> closeBtn}}</div>"
+		// <!-- error message Mustache template partials -->
+		const partials = "closeBtn: \'<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>\'";
+
+		let ajaxErrMsg = "";
+		let tmplt = 0;
+
+		// remove any existing messages
+		//$outputDiv.empty().text(' ');		// clear out the previous error messages
+
+		if (mType ==ERRMSG) {
+			// if an error message
+			tmplt = errTemplate;
+			ajaxErrMsg = `Error (${fType}): status: (${sTxt}), Error message = ${eTxt}`;
+
+		} else {
+			// if a primary message
+			tmplt = priTemplate;
+			ajaxErrMsg = `Alert (${fType}): status: OK, Message = ${eTxt}`;
+
+		}
+		//window.alert (ajaxErrMsg);
+		//console.log (`DSM ERROR: ${ajaxErrMsg}`);
+		
+		const $alert = $(Mustache.render(tmplt, { message: ajaxErrMsg }, partials));
+		$alert.alert({});
+		console.log ("DSM: append message to output div ");
+		$outputDiv.append($alert);
+
+		return;
+	}
+
+	// ========================================================
+	// Button Click Event Handlers
+	// ========================================================
+	// set handlers for when checkboxes change
+	// new timezone selected
+	
+	// validate timezone string entered
+	$TZSEL_SELECT.on('input', function(){
+		// validate the timezone
+		if (CW3.isValidTimeZone($TZSEL_SELECT.val())) {
+			// is valid
+			TZ_selected = $TZSEL_SELECT.val();		// get the tz entered
+			$TZSEL_SELECT.removeClass('is-invalid').addClass('is-valid');
+			
+			updateClockDisplay (CW3, 'TZ select');
+			
+			processTimeInput();		// check requested time as well
+
+		} else {
+			// is invalid
+			$TZSEL_SELECT.removeClass('is-valid').addClass('is-invalid');
+
+			// ignore it?
+		}
+	});
+
+	// --------------------------------------------
+	// Process time input.                      -->
+	// IN: input event 
+	// OUT: Updated FT clocks & invitation link
+	// --------------------------------------------
+	function processTimeInput() {
+		console.log ("Go/submit/change form button clicked");
+		$outputDiv.empty().text(' ');		// clear out any previous error messages
+
+		try {
+			let dt = $DATETIME_TB.val();// get date from text-box
+			let m = moment(dt);			// convert it to a moment object
+
+			// verify selected date/time is not too early
+			// if OK, save seletect date/time in global var
+			
+			console.log (`GO: param date in is ${m.format(CLOCK_TIME_FORMAT)}`);
+			
+			$('#datetimepicker2').datetimepicker('hide');
+
+			// make sure selected date/time is not too early. 
+			let earliestTime = moment().add(2,'hours');
+			if (m < earliestTime) {
+				console.log (`GO: selected time is too early.`);
+				console.log (`GO: should be after ${earliestTime.format(PICKER_TIME_FORMAT)}`);
+				//$('#req_link_tb').val("");	// clear TBx
+				$DATETIME_TB.removeClass('is-valid').addClass('is-invalid');
+				throw new Error('Selected time is too early. Must be more than 2 hours from now.');
+
+			} else {
+				console.log ('GO: selected time is JUST RIGHT');
+				$DATETIME_TB.removeClass('is-invalid').addClass('is-valid');
+				$('#req_link_tb').val(m.format(CLOCK_TIME_FORMAT)); // put selected date/time in TBx
+			}
+
+			// use UTC to send invitation time. Put this string in URL & in clocks
+			// PROBLEM: UTC conversion assumes converting from LA TZ
+			// if in debug mode, do something. 
+			let utcStr = "";
+			if (debug) {
+				// do something
+				//utcStr = moment.tz({hour: hrs, minute: mns}, CW2.timezone).utc().format();	
+				utcStr = moment.tz(m, CW2.timezone).utc().format();
+			} else {
+				// Else create moment with requested time in local TZ converted to UTC
+				
+				// if have clock data from URL, do relative to receiver's timezone
+				if (haveClockData) {
+					// if have clock data from URL, do relative to receiver's timezone
+					utcStr = moment.tz(m, CW2.timezone).utc().format();
+
+					console.log (`GO: have URL clock data: CW2 gets ${utcStr} for ${CW2.timezone}`);
+					
+				} else {	// no clock data in URL. use as is
+					console.log ('GO: no URL clock data');
+					//utcStr = moment.tz({hour: hrs, minute: mns}, CW2.timezone).utc().format();	
+					utcStr = moment.tz(m, CW2.timezone).utc().format();
+
+				}
+
+			}
+			
+			console.log (`GO: UTC string is ${utcStr}`);
+			// now convert it back, as seen by remote person
+			// need CW2 & CW3 timezone
+			let rTimeStr = moment(utcStr).tz(CW2.timezone);		// receiver (i.e. local) time string
+			let sTimeStr = moment(utcStr).tz(CW3.timezone);		// sender (i.e. remote) time string
+
+			console.log (`GO: remote request time is ${sTimeStr}, TZ is ${CW3.timezone}`);
+			console.log (`GO: local request time is ${rTimeStr}, TZ is ${CW2.timezone}`);
+
+			// update requestor clocks fixed time attribute, by converting requested time in UTC to 
+			// clock's time
+			CW2.fixedTime = moment(utcStr);	// local clock
+			CW3.fixedTime = moment(utcStr);	// remote clock
+			
+			// render clocks again with updated time
+			CW2.renderClock(CW2);		// local clock
+			CW3.renderClock(CW3);		// remote clock
+			
+			// Build URL with invitation data
+			// create a URI object representing the URL of the page
+			let invtURL = new URI();
+			
+			let stz = CW2.timezone;			// fetch sender data
+			let rtz = CW3.timezone;			// fetch receiver data
+
+			// Build data string
+			let urlAllString = invtURL.toString();	// first get current URL again
+			
+			// strip off any old data strings
+			let uArr = urlAllString.split("?"); // split on start of query
+			let urlString = uArr[0];			// take just first part. S/B URL alone
+			
+			let dataString = "?stz=" + stz + 	// create data part
+					"&rtz=" + rtz + 
+					"&time=" + utcStr;			// send one time in UTC
+			console.log (`GO: data string is ${dataString}`);
+					
+			// put both together & put in text box
+			//invtURL = "domain.html/someFun";
+			$INVITATION_URL.val("").val(urlString+dataString);
+			
+			// select text box
+			$INVITATION_URL.select();
+		
+		} catch (err) {
+			const errDetail = processErrorCondition (err,"Process Meeting Input", "JS");
+			console.log ('Error while processing user input');
+		}
+
+	}
+
+	// --------------------------------------------
+	// Update clock display                     -->
+	// IN: which clock to update, string identifying what changed, 
+	// OUT: nothing, updated clock display
+	// --------------------------------------------
+	// data-timeformat="12" data-displayseconds="TRUE" data-blink="true"
+	function updateClockDisplay (clk, src) {
+		console.log (`UCD: update clock display now: ${src}`);	
+		
+		$outputDiv.empty().text(' ');		// clear out any previous error messages
+
+		// only update clock after it loads
+		if (loadComplete) {
+			try {
+				// set timezone
+				clk.timezone = TZ_selected;
+				
+				// no need to render clock. ProcessTimeInput will do it.
+				
+			} catch (err) {
+				const errDetail = processErrorCondition (err,"updateClockDisplay", src);
+				console.log ('Error while updating clock display');
+			}
+
+		}
+
+	};
+
+	// ******************************************************
+	// Main Document Handler
+	// ******************************************************	
+	console.log ("start DOM");
+		
+	//---------------------------------------------------
+	// Initialization
+	//---------------------------------------------------
+	try {
+		senderData = getURLData();		// get TZ data (if any) from URL
+
+		// configure date & time picker
+		// if date/time from URL, make that the default. Otherwise use current time + 2 hours
+		if (!haveClockData) {
+			console.log (`NO URL clock data`);
+			// get current time + 2 hours + 7 minutes, so default time works
+			defDateTime = moment().add({hours:2, minutes:7}).format(PICKER_TIME_FORMAT);
+			console.log (` defDateTime is ${defDateTime}`);
+
+		} else {
+			console.log (`HAVE URL clock data`);	
+			
+			// default date/time is what sender sent
+			defDateTime = senderData.time.tz(senderData.rtz).format(PICKER_TIME_FORMAT);
+			console.log (` defDateTime is ${defDateTime}`);
+
+		}
+		
+		$('#datetimepicker2').datetimepicker({
+			//sideBySide: true,
+			format: PICKER_TIME_FORMAT,
+			icons: {
+				time: "far fa-clock",
+				date: "fa fa-calendar-alt"
+			},
+			//toolbarPlacement: 'bottom',
+			//keepOpen: false,		// doesn't seem to change anything
+			debug: true,
+			allowInputToggle: true,
+			minDate: startOfDay,
+			defaultDate: defDateTime,	// default date/time is now + 2h 7m
+			stepping: 15
+		});
+		
+
+	} catch (err) {
+		const errDetail = processErrorCondition (err,"Process URL Data", "JS");
+		console.log ('Error while processing URL input data');
+	}
+	console.log (`after GUD. rtz is ${senderData.rtz}`);
+	
+	//---------------------------------------------------
+	// Display clocks
+	//---------------------------------------------------
+	try {
+		
+		addTZOptions();		// create dictionary of valid timezones for auto-complete
+		
+		// configure UI to match data from sender
+		$TZSEL_SELECT.val(senderData.stz);	// set initial timezone to sender/default timezone
+		//$($REQ_HR_DD).val(senderData.localhour);
+		//$($REQ_MN_DD).val(senderData.localminute);
+		
+		console.log ("make local clock");
+		clockWidget = new WorldClock($('#clock1'), 
+			{
+				tz: DEFAULT_TZ, 
+				timeFormat: 24,
+//				displaySeconds: true,
+				blinkSeparators: true
+			});
+//		let CW4 = new WorldClock($('#clock4'), 
+//			{
+//				tz: DEFAULT_TZ, 
+//				timeFormat: 12,
+//				displaySeconds: true
+//			});
+		// fixed-time clocks for user to see times in both timezones
+		console.log ("make request clocks");
+		console.log (`make local clock with time ${senderData.time} and TZ ${senderData.rtz}`);
+		
+		moment.tz.setDefault(senderData.rtz);	// set default timezone to receiver/local TZ
+		
+		CW2 = new WorldClock($('#clock2'),		// for local requested time
+			{
+				tz: senderData.rtz,
+				timeFormat: 24,
+				fixedTime: senderData.time		// can be same time for both clocks. TZ will get us correct time
+			});
+
+		CW3 = new WorldClock($('#clock3'),		// for remote requested time
+			{
+				tz: senderData.stz,
+				timeFormat: 24,
+				fixedTime: senderData.time
+			});
+		
+		loadComplete = true;
+
+	} catch (err) {
+		const errDetail = processErrorCondition (err,"WorldClock class", "JS");
+		console.log ('Error while displaying clock');
+	}
+
+	//---------------------------------------------------
+	// Set defaults, event handlers
+	//---------------------------------------------------
+	//$DATETIME_TB.on('input', processTimeInput);			// input in date/time picker text box
+
+	$('#clock_config_fm').on('submit', processTimeInput);	// if form submitted
+	$GO_BTN.click(processTimeInput);					// when user ready, process input
+
+	TZ_selected = DEFAULT_TZ;
+
+	// add ddr.WorldClock version info to page
+	$('#ddrwc_version').text(WorldClock.version);
+
+	console.log ("end of DOM load");
+	});
+	
+	</script>
+</html>
+
